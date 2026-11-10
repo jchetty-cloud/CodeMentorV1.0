@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ student.display_name }} — CodeMentor{% endblock %}
+
+{% block content %}
+<div class="page-container page-container--wide">
+  <div class="page-header">
+    <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+    <div class="student-header">
+      <div class="student-avatar-lg">{{ student.display_name[0].upper() }}</div>
+      <div>
+        <h1>{{ student.display_name }}</h1>
+        <p>@{{ student.username }} &middot; {{ student.cohort }} &middot; Joined {{ student.created_at.strftime('%d %b %Y') }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  {% set icons = {'explain':'🔍','debug':'🐛','improve':'✨','concept':'📚','quiz':'🎯','review':'📋'} %}
+  <div class="stats-row">
+    <div class="stat-chip">
+      <strong>{{ sessions|length }}</strong> <span>total sessions</span>
+    </div>
+    {% for action, count in action_counts.items() %}
+    {% if count > 0 %}
+    <div class="stat-chip">
+      <span>{{ icons.get(action,'🤖') }}</span>
+      <strong>{{ count }}</strong>
+      <span>{{ action }}</span>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <div class="stat-chip">
+      <strong>{{ sessions|sum(attribute='followups') }}</strong> <span>follow-ups</span>
+    </div>
+  </div>
+
+  <!-- Session history -->
+  {% if not sessions %}
+  <div class="empty-state">
+    <p>No sessions yet for this student.</p>
+  </div>
+  {% else %}
+  <div class="history-list">
+    {% for s in sessions %}
+    <div class="history-card history-card--teacher">
+      <div class="hc-icon">{{ icons.get(s.action, '🤖') }}</div>
+      <div class="hc-body">
+        <div class="hc-meta">
+          <span class="hc-action">{{ s.action|title }}</span>
+          <span class="lang-tag lang-{{ s.language }}">{{ s.language }}</span>
+          {% if s.followups > 0 %}<span class="hc-followups">{{ s.followups }} follow-up{{ 's' if s.followups != 1 }}</span>{% endif %}
+        </div>
+        <div class="hc-snippet">{{ s.code_snippet[:120] }}{% if s.code_snippet|length > 120 %}…{% endif %}</div>
+        {% if s.context and s.context != 'No additional context provided.' %}
+        <div class="hc-context">💬 "{{ s.context[:100] }}{% if s.context|length > 100 %}…{% endif %}"</div>
+        {% endif %}
+      </div>
+      <div class="hc-time">{{ s.created_at.strftime('%d %b') }}<br><small>{{ s.created_at.strftime('%H:%M') }}</small></div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

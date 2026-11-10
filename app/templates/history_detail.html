@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Session Detail — CodeMentor{% endblock %}
+
+{% block content %}
+<div class="page-container page-container--wide">
+  <div class="page-header">
+    <a href="{{ url_for('history') }}" class="back-link">← Back to History</a>
+    <h1>
+      {% if ts.action == 'explain' %}🔍
+      {% elif ts.action == 'debug' %}🐛
+      {% elif ts.action == 'improve' %}✨
+      {% elif ts.action == 'concept' %}📚
+      {% elif ts.action == 'quiz' %}🎯
+      {% else %}📋{% endif %}
+      {{ ts.action|title }} Session
+    </h1>
+    <p>{{ ts.created_at.strftime('%A, %d %B %Y at %H:%M') }} &middot;
+       <span class="lang-tag lang-{{ ts.language }}">{{ ts.language }}</span>
+       {% if ts.followups %}&middot; {{ ts.followups }} follow-up{{ 's' if ts.followups != 1 }}{% endif %}
+    </p>
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-col">
+      <h2 class="col-title">Your Code</h2>
+      <pre class="detail-code"><code class="{{ ts.language }}">{{ ts.code_snippet }}</code></pre>
+      {% if ts.context and ts.context != 'No additional context provided.' %}
+      <div class="detail-context">
+        <h3>Your Notes</h3>
+        <p>{{ ts.context }}</p>
+      </div>
+      {% endif %}
+    </div>
+    <div class="detail-col">
+      <h2 class="col-title">CodeMentor's Response</h2>
+      <div class="detail-response markdown-body" id="response-body">{{ ts.response }}</div>
+    </div>
+  </div>
+
+  <div class="detail-actions">
+    <a href="{{ url_for('index') }}" class="btn-primary">🤖 Back to Tutor</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Render the stored markdown response
+  const el = document.getElementById('response-body');
+  marked.setOptions({ gfm: true, breaks: true });
+  el.innerHTML = marked.parse(el.textContent);
+  el.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+</script>
+{% endblock %}

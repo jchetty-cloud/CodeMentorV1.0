@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}My History — CodeMentor{% endblock %}
+
+{% block content %}
+<div class="page-container">
+  <div class="page-header">
+    <h1>📚 My Learning History</h1>
+    <p>{{ sessions|length }} session{{ 's' if sessions|length != 1 }} recorded</p>
+  </div>
+
+  {% if not sessions %}
+  <div class="empty-state">
+    <div class="empty-icon">🌱</div>
+    <h3>No sessions yet</h3>
+    <p>Head to the tutor and start coding — your history will appear here.</p>
+    <a href="{{ url_for('index') }}" class="btn-primary">Go to Tutor →</a>
+  </div>
+  {% else %}
+
+  <!-- Stats bar -->
+  <div class="stats-row">
+    {% set action_counts = {} %}
+    {% for s in sessions %}
+      {% if s.action in action_counts %}
+        {% set _ = action_counts.update({s.action: action_counts[s.action] + 1}) %}
+      {% else %}
+        {% set _ = action_counts.update({s.action: 1}) %}
+      {% endif %}
+    {% endfor %}
+    {% set icons = {'explain':'🔍','debug':'🐛','improve':'✨','concept':'📚','quiz':'🎯','review':'📋'} %}
+    {% for action, count in action_counts.items() %}
+    <div class="stat-chip">
+      <span>{{ icons.get(action, '🤖') }}</span>
+      <strong>{{ count }}</strong>
+      <span>{{ action }}</span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="history-list">
+    {% for s in sessions %}
+    <a href="{{ url_for('history_detail', session_id=s.id) }}" class="history-card">
+      <div class="hc-icon">
+        {% if s.action == 'explain' %}🔍
+        {% elif s.action == 'debug' %}🐛
+        {% elif s.action == 'improve' %}✨
+        {% elif s.action == 'concept' %}📚
+        {% elif s.action == 'quiz' %}🎯
+        {% else %}📋{% endif %}
+      </div>
+      <div class="hc-body">
+        <div class="hc-meta">
+          <span class="hc-action">{{ s.action|title }}</span>
+          <span class="hc-lang lang-tag lang-{{ s.language }}">{{ s.language }}</span>
+          {% if s.followups > 0 %}
+          <span class="hc-followups">{{ s.followups }} follow-up{{ 's' if s.followups != 1 }}</span>
+          {% endif %}
+        </div>
+        <div class="hc-snippet">{{ s.code_snippet[:80] }}{% if s.code_snippet|length > 80 %}…{% endif %}</div>
+      </div>
+      <div class="hc-time">{{ s.created_at.strftime('%d %b') }}<br><small>{{ s.created_at.strftime('%H:%M') }}</small></div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

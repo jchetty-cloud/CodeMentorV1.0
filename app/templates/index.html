@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}CodeMentor — Python Tutor{% endblock %}
+
+{% block content %}
+<div class="tutor-layout">
+
+  <!-- Left: Code Input -->
+  <section class="panel panel-input">
+    <div class="panel-header">
+      <h2>Your Code</h2>
+      <div class="panel-controls">
+        <div class="lang-badge" id="lang-badge">
+          <span class="lang-dot"></span>
+          <span id="lang-name">Python</span>
+        </div>
+        <button class="btn-ghost" id="clear-btn">✕ Clear</button>
+      </div>
+    </div>
+
+    <div class="code-editor-wrapper">
+      <textarea id="code-input" class="code-editor" spellcheck="false"
+        placeholder="# Paste or type your Python code here...
+# CodeMentor will detect the language automatically!
+
+def greet(name):
+    print(f'Hello, {name}!')
+
+greet('World')"></textarea>
+    </div>
+
+    <div class="context-section">
+      <label for="context-input">What's the problem? (optional)</label>
+      <textarea id="context-input" class="context-editor" rows="3"
+        placeholder="e.g. 'My loop runs one too many times' or 'I don't understand why I need self here'"></textarea>
+    </div>
+
+    <!-- Recent sessions -->
+    {% if recent %}
+    <div class="recent-section">
+      <h3 class="recent-title">Recent Sessions</h3>
+      <div class="recent-list">
+        {% for s in recent %}
+        <a href="{{ url_for('history_detail', session_id=s.id) }}" class="recent-item">
+          <span class="recent-icon">
+            {% if s.action == 'explain' %}🔍
+            {% elif s.action == 'debug' %}🐛
+            {% elif s.action == 'improve' %}✨
+            {% elif s.action == 'concept' %}📚
+            {% elif s.action == 'quiz' %}🎯
+            {% else %}📋{% endif %}
+          </span>
+          <span class="recent-meta">
+            <span class="recent-action">{{ s.action|title }}</span>
+            <span class="recent-time">{{ s.created_at.strftime('%d %b, %H:%M') }}</span>
+          </span>
+          <span class="recent-lang">{{ s.language }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Right: Tutor -->
+  <section class="panel panel-tutor">
+
+    <!-- Action buttons -->
+    <div class="actions-grid">
+      {% for action in actions %}
+      <button class="action-btn" data-action="{{ action.key }}">
+        <span class="action-icon">{{ action.icon }}</span>
+        <span class="action-label">{{ action.label }}</span>
+      </button>
+      {% endfor %}
+    </div>
+
+    <!-- Response -->
+    <div class="response-area" id="response-area">
+      <div class="response-placeholder">
+        <div class="placeholder-icon">🤖</div>
+        <h3>Hello, {{ session.get('name', 'there') }}!</h3>
+        <p>Paste your Python code on the left, then choose what kind of help you need.</p>
+        <div class="action-tips">
+          {% for action in actions %}
+          <div class="tip-chip">{{ action.icon }} <strong>{{ action.label }}</strong></div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Follow-up chat -->
+    <div class="followup-section" id="followup-section" style="display:none;">
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-row">
+        <input type="text" id="followup-input" class="chat-input"
+               placeholder="Ask a follow-up question…"/>
+        <button class="btn-send" id="send-btn">Send ↵</button>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-card">
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+    <p id="loading-message">CodeMentor is thinking…</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}

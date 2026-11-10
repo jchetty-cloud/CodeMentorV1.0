@@ -1,0 +1,19 @@
+# Environment variables and secrets
+.env
+.env.*
+
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local databases and research data
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Mac and IDE files
+.DS_Store
+.idea/

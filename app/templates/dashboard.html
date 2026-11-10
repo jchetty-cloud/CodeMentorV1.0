@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Teacher Dashboard — CodeMentor{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+
+  <!-- Sidebar -->
+  <aside class="dash-sidebar">
+    <div class="sidebar-section">
+      <h3>Cohorts</h3>
+      <button class="cohort-btn active" data-cohort="all">All Students</button>
+      {% for cohort in cohorts %}
+      <button class="cohort-btn" data-cohort="{{ cohort }}">{{ cohort }}</button>
+      {% endfor %}
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Students <span class="badge">{{ total_students }}</span></h3>
+      <div class="student-list">
+        {% for student in students %}
+        <a href="{{ url_for('student_detail', student_id=student.id) }}" class="student-link">
+          <div class="student-avatar">{{ student.display_name[0].upper() }}</div>
+          <div class="student-info">
+            <span class="student-name">{{ student.display_name }}</span>
+            <span class="student-cohort">{{ student.cohort }}</span>
+          </div>
+          <span class="student-sessions">{{ student.sessions|length }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main dashboard -->
+  <div class="dash-main">
+
+    <!-- Top stats -->
+    <div class="dash-stats">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-value">{{ total_students }}</div>
+        <div class="stat-label">Students</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-value">{{ total_sessions }}</div>
+        <div class="stat-label">Total Sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        {% set top = action_counts.items()|list|sort(attribute='1', reverse=True)|first %}
+        <div class="stat-value">{{ tutor_actions[top[0]]['icon'] }}</div>
+        <div class="stat-label">Top: {{ top[0]|title }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🐍</div>
+        {% set top_lang = lang_counts.items()|list|sort(attribute='1', reverse=True)|first %}
+        <div class="stat-value">{{ top_lang[0] if top_lang else 'python' }}</div>
+        <div class="stat-label">Top Language</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>Activity (Last 14 Days)</h3>
+        <canvas id="activityChart" height="120"></canvas>
+      </div>
+      <div class="chart-card chart-card--sm">
+        <h3>Sessions by Mode</h3>
+        <canvas id="actionChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent activity table -->
+    <div class="table-card">
+      <div class="table-header">
+    <h3>Recent Student Sessions</h3>
+
+    <div>
+        <span class="table-subtitle">Last 20 sessions</span>
+
+        <a href="{{ url_for('export_conversations') }}"
+           class="table-link"
+           style="margin-left: 18px;">
+            ↓ Download Research Data (CSV)
+        </a>
+    </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Cohort</th>
+            <th>Mode</th>
+            <th>Language</th>
+            <th>Follow-ups</th>
+            <th>Code (preview)</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ts in recent_sessions %}
+          <tr>
+            <td>
+              <a href="{{ url_for('student_detail', student_id=ts.user_id) }}" class="table-link">
+                {{ ts.user.display_name }}
+              </a>
+            </td>
+            <td class="text-muted">{{ ts.user.cohort }}</td>
+            <td>
+              <span class="mode-chip mode-{{ ts.action }}">
+                {{ tutor_actions[ts.action]['icon'] }} {{ ts.action }}
+              </span>
+            </td>
+            <td><span class="lang-tag lang-{{ ts.language }}">{{ ts.language }}</span></td>
+            <td class="text-center">
+              {% if ts.followups > 0 %}<span class="badge-green">{{ ts.followups }}</span>{% else %}—{% endif %}
+            </td>
+            <td class="code-preview">{{ ts.code_snippet[:60] }}{% if ts.code_snippet|length > 60 %}…{% endif %}</td>
+            <td class="text-muted text-sm">{{ ts.created_at.strftime('%d %b %H:%M') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+    <title>{% block title %}CodeMentor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+<header>
+    <div class="brand">⌨️ CodeMentor</div>
+    {% if session.get('user_id') %}
+        <nav>
+            {% if session.get('role') == 'teacher' %}
+                <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+            {% else %}
+                <a href="{{ url_for('index') }}">🤖 Tutor</a>
+                <a href="{{ url_for('history') }}">📚 My History</a>
+            {% endif %}
+            <span>{{ session.get('name', 'User') }}</span>
+            <a href="{{ url_for('logout') }}">Sign out</a>
+        </nav>
+    {% endif %}
+</header>
+<main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+</main>
+
+<!-- CDN libraries must load before any page-specific JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

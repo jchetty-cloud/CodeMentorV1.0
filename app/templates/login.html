@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — CodeMentor{% endblock %}
+
+{% block content %}
+
+<h1>⌨️ CodeMentor</h1>
+<p>Your AI-powered Python tutor</p>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.username.label }}
+    {{ form.username() }}
+
+    {{ form.password.label }}
+    {{ form.password() }}
+
+    <button type="submit">Login</button>
+</form>
+
+<p>New student? Create an account</p>
+
+<p>Teachers: use your instructor credentials</p>
+
+{% endblock %}
