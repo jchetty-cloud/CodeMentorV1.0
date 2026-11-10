@@ -13,3 +13,6 @@ csrf = CSRFProtect(app)   # protects all HTML form POSTs automatically
 client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from environment
 
 from app import routes, models
+
+with app.app_context():
+    db.create_all()
