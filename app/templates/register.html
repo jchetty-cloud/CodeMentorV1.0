@@ -13,6 +13,15 @@
 
     <form method="POST" class="auth-form">
         {{ form.hidden_tag() }}
+        {% if form.errors %}
+            <div class="form-errors">
+                {% for field, errors in form.errors.items() %}
+                    {% for error in errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
       <div class="form-group">
         <label for="display_name">Full Name</label>
         <input type="text" id="display_name" name="display_name" required
@@ -33,6 +42,15 @@
         <label for="password">Password</label>
         <input type="password" id="password" name="password" required
                placeholder="Choose a password" autocomplete="new-password"/>
+      </div>
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password"
+               id="confirm_password"
+               name="confirm_password"
+               required
+               placeholder="Repeat your password"
+               autocomplete="new-password"/>
       </div>
       <button type="submit" class="btn-primary btn-full">Create Account →</button>
     </form>
