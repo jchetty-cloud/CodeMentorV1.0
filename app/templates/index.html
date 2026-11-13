@@ -89,14 +89,27 @@ greet('World')"></textarea>
     </div>
 
     <!-- Follow-up chat -->
-    <div class="followup-section" id="followup-section" style="display:none;">
-      <div class="chat-messages" id="chat-messages"></div>
-      <div class="chat-input-row">
-        <input type="text" id="followup-input" class="chat-input"
-               placeholder="Ask a follow-up question…"/>
+
+<div class="followup-section" id="followup-section" style="display:none;">
+
+    <!-- Conversation messages appear here -->
+    <div class="chat-messages" id="chat-messages"></div>
+
+    <!-- Student enters questions or Python code here -->
+    <div class="chat-input-row">
+        <textarea
+            id="followup-input"
+            class="chat-input"
+            rows="5"
+            placeholder="Write your response or Python code here..."
+            spellcheck="false"
+        ></textarea>
+
         <button class="btn-send" id="send-btn">Send ↵</button>
-      </div>
     </div>
+
+</div>
+
 
   </section>
 </div>

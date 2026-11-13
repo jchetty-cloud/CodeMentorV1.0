@@ -9,6 +9,7 @@
 <body class="{% block body_class %}{% endblock %}">
 <header>
     <div class="brand">⌨️ CodeMentor</div>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     {% if session.get('user_id') %}
         <nav>
             {% if session.get('role') == 'teacher' %}

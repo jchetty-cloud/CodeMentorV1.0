@@ -23,11 +23,16 @@ class LoginForm(FlaskForm):
 
     username = StringField(
         "Username",
+        filters=[lambda value: (value or "").strip().lower()],
         validators=[
-            DataRequired(message="Please enter your username."),
+            DataRequired(message="Please choose a username."),
             Length(min=2, max=80, message="Username must be 2–80 characters."),
+            Regexp(
+                r"^[a-z0-9._-]+$",
+                message="Use lowercase letters, numbers, dots, hyphens and underscores only.",
+            ),
         ],
-        render_kw={"placeholder": "your.username", "autocomplete": "username"},
+        render_kw={"placeholder": "jsmith", "autocomplete": "username"},
     )
 
     password = PasswordField(

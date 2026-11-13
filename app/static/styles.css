@@ -251,10 +251,39 @@ button { cursor: pointer; font-family: var(--font-ui); }
 .chat-bubble { max-width: 85%; padding: 0.45rem 0.8rem; border-radius: 12px; font-size: 0.82rem; line-height: 1.5; }
 .chat-message.user .chat-bubble { background: rgba(124,106,247,0.2); color: var(--text); border-bottom-right-radius: 3px; }
 .chat-message.assistant .chat-bubble { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-bottom-left-radius: 3px; }
-.chat-input-row { display: flex; gap: 0.5rem; padding: 0.65rem 1rem; border-top: 1px solid var(--border); }
-.chat-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: var(--font-ui); font-size: 0.83rem; padding: 0.45rem 0.8rem; border-radius: var(--radius-sm); outline: none; transition: border-color var(--t); }
-.chat-input:focus { border-color: var(--accent2); }
-.chat-input::placeholder { color: var(--text-muted); }
+.chat-input-row {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-top: 1px solid var(--border);
+    align-items: flex-end;
+}
+
+.chat-input {
+    flex: 1;
+    min-height: 110px;
+    max-height: 250px;
+    resize: vertical;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    padding: 0.65rem 0.8rem;
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color var(--t);
+    box-sizing: border-box;
+}
+
+.chat-input:focus {
+    border-color: var(--accent2);
+}
+
+.chat-input::placeholder {
+    color: var(--text-muted);
+}
 
 /* ── Buttons ─────────────────────────────────────────────────── */
 .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: var(--font-ui); font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: var(--radius-sm); transition: all var(--t); }

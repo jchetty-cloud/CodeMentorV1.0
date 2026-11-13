@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── State ─────────────────────────────────────────────────────
   let conversationHistory = [];
-  let currentCode = '';
   let currentSessionId = null;
+  let currentCode = '';
   let detectTimeout = null;
   let detectedLang = 'python';
 
@@ -188,37 +188,61 @@ document.addEventListener('DOMContentLoaded', () => {
     if (followupInp) followupInp.focus();
   }
 
-  async function sendFollowup() {
+
+async function sendFollowup() {
     if (!followupInp) return;
+
     const q = followupInp.value.trim();
     if (!q) return;
+
     followupInp.value = '';
+
     if (sendBtn) sendBtn.disabled = true;
+
     appendChat('user', q);
     conversationHistory.push({ role: 'user', content: q });
 
     try {
-      const res = await fetch('/api/followup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          history: conversationHistory.slice(0, -1),
-          question: q,
-          code: currentCode,
-          session_id: currentSessionId,
-        }),
-      });
-      const data = await res.json();
-      const reply = data.error ? '⚠️ ' + data.error : data.response;
-      appendChat('assistant', reply);
-      if (!data.error) conversationHistory.push({ role: 'assistant', content: reply });
-    } catch {
-      appendChat('assistant', '⚠️ Connection error.');
+        const res = await fetch('/api/followup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                history: conversationHistory.slice(0, -1),
+                question: q,
+                code: currentCode,
+                session_id: currentSessionId,
+            }),
+        });
+
+        const data = await res.json();
+
+        console.log("FOLLOWUP API RESPONSE:", data);
+
+        const reply = data.error
+            ? '⚠️ ' + data.error
+            : data.response;
+
+        appendChat('assistant', reply);
+
+        if (!data.error) {
+            conversationHistory.push({
+                role: 'assistant',
+                content: reply
+            });
+        }
+
+    } catch (err) {
+        console.error("Follow-up error:", err);
+        appendChat('assistant', '⚠️ Connection error.');
+
     } finally {
-      if (sendBtn) sendBtn.disabled = false;
-      if (followupInp) followupInp.focus();
+        if (sendBtn) sendBtn.disabled = false;
+        if (followupInp) followupInp.focus();
     }
-  }
+}
+
 
   // ── Micro-interaction ─────────────────────────────────────────
   function shakeEl(el) {
@@ -249,10 +273,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Event listeners ───────────────────────────────────────────
   actionBtns.forEach(b => b.addEventListener('click', () => runTutor(b.dataset.action)));
 
-  if (sendBtn)      sendBtn.addEventListener('click', sendFollowup);
-  if (followupInp)  followupInp.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendFollowup(); }
-  });
+//  if (sendBtn)      sendBtn.addEventListener('click', sendFollowup);
+    if (sendBtn) sendBtn.addEventListener('click', () => {
+        console.log("SEND BUTTON CLICKED");
+        sendFollowup();
+    });
+  if (followupInp) {
+    followupInp.addEventListener('keydown', e => {
+        // Allow Enter to create a new line in the response area
+        // Submission is handled by the Send button
+    });
+}
 
   // ── Init ──────────────────────────────────────────────────────
   if (codeInput) codeInput.focus();
